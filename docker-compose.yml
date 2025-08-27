@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  backend:
+    build: ./backend
+    image: ghcr.io/thedarkestabed/task-platform-backend:v2.0.0-vibe
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/app.db
+      - BASE_URL=http://backend:8000
+    volumes:
+      - backend_data:/app/data
+      - backend_storage:/app/app/storage
+    ports:
+      - "8000:8000"
+  frontend:
+    build: ./frontend
+    image: ghcr.io/thedarkestabed/task-platform-frontend:v2.0.0-vibe
+    environment:
+      - BACKEND_URL=http://backend:8000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+  worker:
+    build: ./worker
+    image: ghcr.io/thedarkestabeddo/task-platform-worker:v2.0.0-vibe
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+volumes:
+  backend_data: {}
+  backend_storage: {}
